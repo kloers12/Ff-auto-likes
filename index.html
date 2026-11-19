@@ -72,9 +72,9 @@ async function login(){
     return;
   }
 
-  alert("LOGIN SUCCESS!");
-  showPanel();
-}
+ alert("LOGIN SUCCESS!");
+document.getElementById("login").style.display = "none";
+document.getElementById("panel").style.display = "block";
 
 async function showPanel(){
   document.getElementById("login").classList.add("hidden");
