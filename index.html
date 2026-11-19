@@ -55,13 +55,23 @@ const db = window.supabase.createClient(
 );
 
 async function login(){
- alert("LOGIN BUTTON WORKS!");
- const {data,error}=await db.auth.signInWithPassword({
-  email:document.getElementById("email").value,
-  password:document.getElementById("password").value
- });
- if(error){alert(error.message);return;}
- showPanel();
+  alert("LOGIN FUNCTION STARTED!");
+
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+
+  const {data,error} = await db.auth.signInWithPassword({
+    email,
+    password
+  });
+
+  if(error){
+    alert("Login error: " + error.message);
+    return;
+  }
+
+  alert("LOGIN SUCCESS!");
+  showPanel();
 }
 
 async function showPanel(){
