@@ -1,37 +1,181 @@
+
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>FF Auto Likes</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 body {
- background:#101827;
- color:white;
- font-family:Arial;
- text-align:center;
- padding:30px;
+  background:#101827;
+  color:white;
+  font-family:Arial,sans-serif;
+  text-align:center;
+  padding:25px;
+}
+.container {
+  max-width:400px;
+  margin:40px auto;
+  background:#1e293b;
+  padding:25px;
+  border-radius:15px;
 }
 input,button {
- padding:14px;
- margin:10px;
- border-radius:8px;
+  box-sizing:border-box;
+  width:100%;
+  padding:14px;
+  margin:9px 0;
+  border:0;
+  border-radius:8px;
 }
+button {
+  background:#ff7a00;
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+}
+.hidden {display:none;}
+#message {color:#fbbf24;}
 </style>
 </head>
 <body>
+
 <h1>🔥 FF AUTO LIKES</h1>
 
-<div>
-<input id="email" placeholder="Email">
-<input id="password" type="password" placeholder="Password">
-<button onclick="test()">LOGIN TEST</button>
+<div class="container" id="loginBox">
+  <h2>Login</h2>
+  <input id="email" type="email" placeholder="Email">
+  <input id="password" type="password" placeholder="Password">
+  <button onclick="login()">LOGIN</button>
 </div>
 
+<div class="container hidden" id="dashboard">
+  <h2>Dashboard</h2>
+  <p>Submit a likes request</p>
+  <input id="uid" placeholder="Free Fire UID">
+  <input id="amount" type="number" placeholder="Likes amount">
+  <button onclick="sendRequest()">SEND REQUEST</button>
+  <h3>Request History</h3>
+  <div id="history">No requests yet.</div>
+  <button onclick="logout()">LOGOUT</button>
+</div>
+
+<p id="message"></p>
+
 <script>
-function test() {
- alert("THE BUTTON WORKS!");
+const SUPABASE_URL = "https://hmztfafprmtuicvugllx.supabase.co";
+const SUPABASE_KEY = "sb_publishable_HnM5h8atimCfNtT7WByIHw_TJrsQIgT";
+
+const db = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+
+const message = document.getElementById("message");
+
+async function login() {
+  message.textContent = "Logging in...";
+
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+
+  const { data, error } = await db.auth.signInWithPassword({
+    email,
+    password
+  });
+
+  if (error) {
+    message.textContent = error.message;
+    return;
+  }
+
+  document.getElementById("loginBox").classList.add("hidden");
+  document.getElementById("dashboard").classList.remove("hidden");
+  message.textContent = "Login successful!";
+  loadHistory();
 }
+
+async function sendRequest() {
+  const uid = document.getElementById("uid").value.trim();
+  const amount = Number(document.getElementById("amount").value);
+
+  if (!uid || !Number.isInteger(amount) || amount < 1) {
+    message.textContent = "Enter a valid UID and amount.";
+    return;
+  }
+
+  const { data: { user } } = await db.auth.getUser();
+
+  if (!user) {
+    message.textContent = "Please log in again.";
+    return;
+  }
+
+  const { error } = await db.from("likes_requests").insert({
+    uid: uid,
+    amount: amount,
+    user_id: user.id
+  });
+
+  if (error) {
+    message.textContent = error.message;
+    return;
+  }
+
+  message.textContent = "Request submitted!";
+  document.getElementById("uid").value = "";
+  document.getElementById("amount").value = "";
+  loadHistory();
+}
+
+async function loadHistory() {
+  const { data, error } = await db
+    .from("likes_requests")
+    .select("uid, amount, status, created_at")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    message.textContent = error.message;
+    return;
+  }
+
+  const history = document.getElementById("history");
+  history.innerHTML = "";
+
+  if (!data.length) {
+    history.textContent = "No requests yet.";
+    return;
+  }
+
+  data.forEach(item => {
+    const row = document.createElement("p");
+    row.textContent =
+      "UID: " + item.uid +
+      " | Likes: " + item.amount +
+      " | Status: " + item.status;
+    history.appendChild(row);
+  });
+}
+
+async function logout() {
+  await db.auth.signOut();
+  document.getElementById("dashboard").classList.add("hidden");
+  document.getElementById("loginBox").classList.remove("hidden");
+  message.textContent = "Logged out.";
+}
+
+async function checkSession() {
+  const { data } = await db.auth.getSession();
+
+  if (data.session) {
+    document.getElementById("loginBox").classList.add("hidden");
+    document.getElementById("dashboard").classList.remove("hidden");
+    loadHistory();
+  }
+}
+
+checkSession();
 </script>
 </body>
 </html>
-
