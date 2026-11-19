@@ -1,140 +1,36 @@
-
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>FF Auto Likes</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-body{background:#101827;color:white;font-family:Arial;
-display:flex;justify-content:center;align-items:center;
-min-height:100vh;margin:0}
-.card{background:#1c293c;padding:25px;border-radius:18px;
-width:85%;max-width:380px}
-h1{color:#ffb52e;text-align:center}
-input,select,button{width:100%;padding:14px;margin:9px 0;
-box-sizing:border-box;border:0;border-radius:9px}
-button{background:#ffb52e;font-weight:bold}
-.hidden{display:none}
-li{margin:12px 0;font-size:14px}
-#message{color:#62e6a0}
+body {
+ background:#101827;
+ color:white;
+ font-family:Arial;
+ text-align:center;
+ padding:30px;
+}
+input,button {
+ padding:14px;
+ margin:10px;
+ border-radius:8px;
+}
 </style>
 </head>
 <body>
-<div class="card">
 <h1>🔥 FF AUTO LIKES</h1>
 
-<div id="login">
-<h3>Private Login 🔐</h3>
-<input id="email" type="email" placeholder="Your email">
+<div>
+<input id="email" placeholder="Email">
 <input id="password" type="password" placeholder="Password">
-<button type="button" onclick="login()">LOGIN</button>
-
-<div id="panel" class="hidden">
-<h3>Welcome, Admin!</h3>
-<input id="uid" placeholder="Free Fire UID">
-<select id="amount">
-<option value="100">100 Likes</option>
-<option value="200">200 Likes</option>
-</select>
-<button onclick="sendRequest()">SEND REQUEST ❤️</button>
-<p id="message"></p>
-<h3>Request History 📋</h3>
-<ul id="history"></ul>
-<button onclick="logout()">LOG OUT</button>
-</div>
+<button onclick="test()">LOGIN TEST</button>
 </div>
 
 <script>
-const SUPABASE_URL = "https://hmztfafprmtuicvugllx.supabase.co";
-const SUPABASE_KEY = "sb_publishable_HnM5h8atimCfNtT7WByIHw_TJrsQIgT";
-
-const db = window.supabase.createClient(
- SUPABASE_URL,
- SUPABASE_KEY
-);
-
-async function login(){
-  alert("LOGIN FUNCTION STARTED!");
-
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
-
-  alert("CONNECTING TO SUPABASE...");
- const {data,error} = await db.auth.signInWithPassword({
-    email,
-    password
-  });
- alert("SUPABASE RESPONDED!");
-
-  if(error){
-    alert("Login error: " + error.message);
-    return;
-  }
-
- alert("LOGIN SUCCESS!");
-document.getElementById("login").style.display = "none";
-document.getElementById("panel").style.display = "block";
-
-async function showPanel(){
-  document.getElementById("login").classList.add("hidden");
-  document.getElementById("panel").classList.remove("hidden");
-
-  document.getElementById("message").textContent =
-    "Welcome! Your private panel is ready.";
-
-  await loadHistory();
+function test() {
+ alert("THE BUTTON WORKS!");
 }
-
-async function sendRequest(){
- const uid=document.getElementById("uid").value.trim();
- const amount=Number(document.getElementById("amount").value);
- const message=document.getElementById("message");
-
- if(!/^\d{5,20}$/.test(uid)){
-  message.textContent="Invalid UID!";
-  return;
- }
-
- const {error}=await db.from("likes_requests").insert({
-  uid:uid,
-  amount:amount
- });
-
- if(error){message.textContent=error.message;return;}
-
- message.textContent="Request saved successfully!";
- document.getElementById("uid").value="";
- await loadHistory();
-}
-
-async function loadHistory(){
- const {data,error}=await db.from("likes_requests")
- .select("id,uid,amount,status,created_at")
- .order("created_at",{ascending:false});
-
- const list=document.getElementById("history");
- list.replaceChildren();
-
- if(error){list.textContent="Could not load history.";return;}
-
- data.forEach(item=>{
-  const li=document.createElement("li");
-  li.textContent="UID: "+item.uid+" | "+item.amount+
-   " likes | "+item.status;
-  list.appendChild(li);
- });
-}
-
-async function logout(){
- await db.auth.signOut();
- document.getElementById("panel").classList.add("hidden");
- document.getElementById("login").classList.remove("hidden");
-}
-
-db.auth.getSession().then(({data})=>{
- if(data.session) showPanel();
-});
 </script>
 </body>
 </html>
