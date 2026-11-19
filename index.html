@@ -1,0 +1,77 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FF Auto Likes</title>
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:#101827;
+  color:white;
+  font-family:Arial,sans-serif;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  min-height:100vh;
+}
+.container{
+  width:90%;
+  max-width:400px;
+  background:#1c293c;
+  padding:25px;
+  border-radius:18px;
+  text-align:center;
+}
+h1{color:#ffb52e}
+input,button{
+  width:100%;
+  padding:14px;
+  margin:10px 0;
+  border:0;
+  border-radius:9px;
+}
+button{
+  background:#ffb52e;
+  font-weight:bold;
+  cursor:pointer;
+}
+select{width:100%;padding:13px;border-radius:9px}
+#result{color:#62e6a0}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>🔥 FF AUTO LIKES</h1>
+<p>Private Free Fire Likes Panel</p>
+
+<input id="uid" placeholder="Enter your Free Fire UID">
+
+<select id="amount">
+<option value="100">100 Likes</option>
+<option value="200">200 Likes</option>
+</select>
+
+<button onclick="sendLikes()">SEND LIKES ❤️</button>
+
+<p id="result"></p>
+</div>
+
+<script>
+function sendLikes(){
+ const uid=document.getElementById("uid").value.trim();
+ const result=document.getElementById("result");
+
+ if(!/^\d{5,20}$/.test(uid)){
+   result.textContent="Enter a valid numeric UID!";
+   return;
+ }
+
+ result.textContent=
+ "Request saved locally for UID "+uid+
+ ". Actual likes require an authorized provider.";
+}
+</script>
+</body>
+</html>
