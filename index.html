@@ -77,9 +77,13 @@ async function login(){
 }
 
 async function showPanel(){
- document.getElementById("login").classList.add("hidden");
- document.getElementById("panel").classList.remove("hidden");
- await loadHistory();
+  document.getElementById("login").classList.add("hidden");
+  document.getElementById("panel").classList.remove("hidden");
+
+  document.getElementById("message").textContent =
+    "Welcome! Your private panel is ready.";
+
+  await loadHistory();
 }
 
 async function sendRequest(){
